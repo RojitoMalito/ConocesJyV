@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¿Cuánto me conoces, Viri?</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #ffeef8 0%, #fff0f5 50%, #ffe4e6 100%);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Corazones flotantes */
+        .floating-hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .heart {
+            position: absolute;
+            color: #ff9eb5;
+            font-size: 20px;
+            animation: float 6s ease-in-out infinite;
+            opacity: 0.7;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            color: #d63384;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(214, 51, 132, 0.2);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #6c757d;
+            font-weight: 400;
+        }
+
+        .quiz-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(214, 51, 132, 0.1);
+            margin-bottom: 30px;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        .question-card {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #fff5f8 0%, #ffeef5 100%);
+            border-radius: 15px;
+            border: 2px solid #ffe4e6;
+            transition: all 0.3s ease;
+            animation: slideInLeft 0.8s ease-out;
+        }
+
+        .question-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(214, 51, 132, 0.15);
+        }
+
+        .question-title {
+            font-size: 1.3rem;
+            color: #d63384;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .question-number {
+            background: #d63384;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .options {
+            display: grid;
+            gap: 12px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background: white;
+            border: 2px solid #ffe4e6;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .option:hover {
+            background: #fff0f5;
+            border-color: #ff9eb5;
+            transform: translateX(5px);
+        }
+
+        .option input[type="radio"] {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            accent-color: #d63384;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #d63384 0%, #ff6b9d 100%);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 30px auto 0;
+            box-shadow: 0 5px 15px rgba(214, 51, 132, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(214, 51, 132, 0.4);
+            background: linear-gradient(135deg, #ff6b9d 0%, #d63384 100%);
+        }
+
+        .result {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, #fff5f8 0%, #ffeef5 100%);
+            border-radius: 20px;
+            border: 3px solid #ff9eb5;
+            margin-top: 30px;
+            animation: bounceIn 1s ease-out;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .result-score {
+            font-size: 3rem;
+            color: #d63384;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .result-message {
+            font-size: 1.4rem;
+            color: #6c757d;
+            font-weight: 500;
+            line-height: 1.6;
+        }
+
+        /* Animaciones */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2rem;
+            }
+            
+            .quiz-container {
+                padding: 20px;
+            }
+            
+            .question-card {
+                padding: 20px;
+            }
+            
+            .question-title {
+                font-size: 1.1rem;
+            }
+            
+            .option {
+                padding: 12px 15px;
+            }
+            
+            .submit-btn {
+                padding: 15px 30px;
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .title {
+                font-size: 1.8rem;
+            }
+            
+            .quiz-container {
+                padding: 15px;
+            }
+            
+            .question-card {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-hearts">
+        <div class="heart" style="left: 10%; animation-delay: 0s;">💕</div>
+        <div class="heart" style="left: 20%; animation-delay: 1s;">💖</div>
+        <div class="heart" style="left: 30%; animation-delay: 2s;">💗</div>
+        <div class="heart" style="left: 40%; animation-delay: 3s;">💝</div>
+        <div class="heart" style="left: 50%; animation-delay: 4s;">💕</div>
+        <div class="heart" style="left: 60%; animation-delay: 5s;">💖</div>
+        <div class="heart" style="left: 70%; animation-delay: 0.5s;">💗</div>
+        <div class="heart" style="left: 80%; animation-delay: 1.5s;">💝</div>
+        <div class="heart" style="left: 90%; animation-delay: 2.5s;">💕</div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1 class="title">🧠 ¿Cuánto me conoces, Viri?</h1>
+            <p class="subtitle">Un pequeño test romántico para descubrir qué tanto sabes sobre mí 💕</p>
+        </div>
+
+        <div class="quiz-container">
+            <form id="quizForm">
+                <div class="question-card">
+                    <div class="question-title">
+                        <span class="question-number">1</span>
+                        ¿En qué fecha empezamos nuestra relación?
+                    </div>
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q1" value="a">
+                            10 de julio
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q1" value="b">
+                            11 de julio
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q1" value="c">
+                            12 de julio
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q1" value="d">
+                            20 de junio
+                        </label>
+                    </div>
+                </div>
+
+                <div class="question-card">
+                    <div class="question-title">
+                        <span class="question-number">2</span>
+                        ¿Qué color me gusta más?
+                    </div>
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q2" value="a">
+                            Verde
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q2" value="b">
+                            Rojo
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q2" value="c">
+                            Amarillo
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q2" value="d">
+                            Blanco
+                        </label>
+                    </div>
+                </div>
+
+                <div class="question-card">
+                    <div class="question-title">
+                        <span class="question-number">3</span>
+                        ¿Qué sueño de la infancia me marcó mucho?
+                    </div>
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q3" value="a">
+                            Volar
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q3" value="b">
+                            Estar en una casita de madera en la colina
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q3" value="c">
+                            Ser astronauta
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q3" value="d">
+                            Ir a la playa solo
+                        </label>
+                    </div>
+                </div>
+
+                <div class="question-card">
+                    <div class="question-title">
+                        <span class="question-number">4</span>
+                        ¿Cuál fue nuestro primer apodo como pareja?
+                    </div>
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q4" value="a">
+                            Bebé
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q4" value="b">
+                            Amor
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q4" value="c">
+                            Pololos
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q4" value="d">
+                            Chanchitos
+                        </label>
+                    </div>
+                </div>
+
+                <div class="question-card">
+                    <div class="question-title">
+                        <span class="question-number">5</span>
+                        ¿Qué me cuesta más en clase?
+                    </div>
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q5" value="a">
+                            Matemática
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q5" value="b">
+                            Comunicación
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q5" value="c">
+                            Historia
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q5" value="d">
+                            Arte
+                        </label>
+                    </div>
+                </div>
+
+                <div class="question-card">
+                    <div class="question-title">
+                        <span class="question-number">6</span>
+                        ¿Cómo me siento cuando estoy callado?
+                    </div>
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q6" value="a">
+                            En paz
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q6" value="b">
+                            Raro
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q6" value="c">
+                            Pensativo
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q6" value="d">
+                            Triste
+                        </label>
+                    </div>
+                </div>
+
+                <div class="question-card">
+                    <div class="question-title">
+                        <span class="question-number">7</span>
+                        ¿Qué animal me gusta más?
+                    </div>
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q7" value="a">
+                            Gato
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q7" value="b">
+                            Perro
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q7" value="c">
+                            Conejo
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q7" value="d">
+                            Dodo
+                        </label>
+                    </div>
+                </div>
+
+                <div class="question-card">
+                    <div class="question-title">
+                        <span class="question-number">8</span>
+                        ¿Qué me gusta más: el frío o el calor?
+                    </div>
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q8" value="a">
+                            Calor
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q8" value="b">
+                            Frío
+                        </label>
+                    </div>
+                </div>
+
+                <div class="question-card">
+                    <div class="question-title">
+                        <span class="question-number">9</span>
+                        ¿Cuál es uno de mis artistas favoritos?
+                    </div>
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q9" value="a">
+                            Bad Bunny
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q9" value="b">
+                            Nasa Histories
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q9" value="c">
+                            Morat
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q9" value="d">
+                            BTS
+                        </label>
+                    </div>
+                </div>
+
+                <div class="question-card">
+                    <div class="question-title">
+                        <span class="question-number">10</span>
+                        ¿Qué me gustaría ser de grande?
+                    </div>
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q10" value="a">
+                            Ingeniero
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q10" value="b">
+                            Profesor de Comunicación
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q10" value="c">
+                            Chef
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q10" value="d">
+                            Doctor
+                        </label>
+                    </div>
+                </div>
+
+                <div class="question-card">
+                    <div class="question-title">
+                        <span class="question-number">11</span>
+                        ¿Qué me hace sonreír más rápido?
+                    </div>
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q11" value="a">
+                            Ver memes
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q11" value="b">
+                            Escuchar tu voz
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q11" value="c">
+                            Comer chocolate
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q11" value="d">
+                            Dormir
+                        </label>
+                    </div>
+                </div>
+
+                <div class="question-card">
+                    <div class="question-title">
+                        <span class="question-number">12</span>
+                        ¿Qué es lo que más amo de ti?
+                    </div>
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q12" value="a">
+                            Tu forma de mirar
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q12" value="b">
+                            Cómo me entiendes sin hablar
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q12" value="c">
+                            Tus abrazos
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q12" value="d">
+                            Tu sonrisa
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">💕 Enviar respuestas 💕</button>
+            </form>
+
+            <div id="result" class="result">
+                <div class="result-score" id="score"></div>
+                <div class="result-message" id="message"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Respuestas correctas (b, a, b, c, a, c, d, b, b, b, b, b)
+        const correctAnswers = {
+            q1: 'b', // 11 de julio
+            q2: 'a', // Verde
+            q3: 'b', // Estar en una casita de madera en la colina
+            q4: 'c', // Pololos
+            q5: 'a', // Matemática
+            q6: 'c', // Pensativo
+            q7: 'd', // Dodo
+            q8: 'b', // Frío
+            q9: 'b', // Nasa Histories
+            q10: 'b', // Profesor de Comunicación
+            q11: 'b', // Escuchar tu voz
+            q12: 'b'  // Cómo me entiendes sin hablar
+        };
+
+        document.getElementById('quizForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            let score = 0;
+            const formData = new FormData(this);
+            
+            // Calcular puntaje
+            for (let question in correctAnswers) {
+                if (formData.get(question) === correctAnswers[question]) {
+                    score++;
+                }
+            }
+            
+            // Mostrar resultado
+            const resultDiv = document.getElementById('result');
+            const scoreDiv = document.getElementById('score');
+            const messageDiv = document.getElementById('message');
+            
+            scoreDiv.textContent = `${score}/12`;
+            
+            if (score === 12) {
+                messageDiv.innerHTML = `¡Increíble! Respondiste ${score}/12.<br>Eres una experta en mí 💘`;
+            } else {
+                messageDiv.innerHTML = `Respondiste ${score}/12.<br>Aun así, me conoces un montón… y cada día me conoces más ❤️`;
+            }
+            
+            // Scroll suave al resultado
+            resultDiv.classList.add('show');
+            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+
+        // Animación de entrada escalonada para las preguntas
+        window.addEventListener('load', function() {
+            const questionCards = document.querySelectorAll('.question-card');
+            questionCards.forEach((card, index) => {
+                card.style.animationDelay = `${0.1 * index}s`;
+            });
+        });
+    </script>
+</body>
+</html>
